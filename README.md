@@ -12,6 +12,11 @@ how much is needed for each transaction. No cleanup required afterward.
 The code contained in this repo is designed to be an example. Modifications will need to be made to put this in production.
 
 ## 1. `./setup.sh <EULITH_REFRESH_TOKEN>`
+
+If you don't know what your `<EULITH_REFRESH_TOKEN>` is, you can get it 
+by logging into https://eulithclient.com. Note this should be the REFRESH token, NOT
+the access token.
+
 This command sets up the appropriate configuration and creates 
 a new wallet if you have not already specified one. Note that this will not overwrite
 the existing private key! So if you accidentally run this twice you can still 
