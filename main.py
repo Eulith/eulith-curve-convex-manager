@@ -167,6 +167,11 @@ if __name__ == '__main__':
         # please get in touch with us for a more complete example & calculation
         # This condition just ensures you're not going to spend more on gas than you're claiming
         # which is "minimum viable" for making sense
+
+        # Note this also doesn't actually recompound, but that's a trivial extension of this demonstration
+        # (swap the CRV rewards for the desired token and reinvest)
+        # Again, this demo is just to give you a sense of the basic operations. A production program will have
+        # to take into account the size of your position, the pools you're using, and the tokens you invest
         if current_rewards_float > 100:
             claim_tx = convex_staking_contract.get_reward({'from': wallet.address,
                                                            'gas': 200000,
@@ -180,4 +185,7 @@ if __name__ == '__main__':
             print('Not enough accumulated reward to justify gas cost of claiming. Skip\n')
 
         print('Awaiting next block...')
-        time.sleep(12)  # blocks on Ethereum come every 11 seconds, circulate around the timing
+        # blocks on Ethereum come every 12 seconds
+        # In production, you would not run this every block, but we do it here to show you the updating
+        # values of your position
+        time.sleep(12)
