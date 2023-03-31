@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     usdc = ew3.v0.get_erc_token(TokenSymbol.USDC)
 
-    tri_pool = CurveV2TriCrypto(ew3, ew3.toChecksumAddress(TRI_CRYPTO_POOL_ADDRESS))
+    tri_pool = CurveV2TriCrypto(ew3, ew3.to_checksum_address(TRI_CRYPTO_POOL_ADDRESS))
     curve_utils = CurveUtils(ew3, tri_pool)
     tokens = curve_utils.get_pool_tokens()
 
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     print(token_string)
 
-    lp_token = EulithERC20(ew3, ew3.toChecksumAddress(tri_pool.token()))
+    lp_token = EulithERC20(ew3, ew3.to_checksum_address(tri_pool.token()))
 
     deposit_token = EulithWETH(ew3, tokens[2].address)  # for this particular pool, third token is WETH
     deposit_amount = 0.01
@@ -86,10 +86,10 @@ if __name__ == '__main__':
         ew3.eth.wait_for_transaction_receipt(dep_hash)
 
     pool_allowance = deposit_token.allowance_float(
-        ew3.toChecksumAddress(wallet.address),
-        ew3.toChecksumAddress(TRI_CRYPTO_POOL_ADDRESS))
+        ew3.to_checksum_address(wallet.address),
+        ew3.to_checksum_address(TRI_CRYPTO_POOL_ADDRESS))
     if pool_allowance < deposit_amount:
-        approve_tx = deposit_token.approve_float(ew3.toChecksumAddress(TRI_CRYPTO_POOL_ADDRESS),
+        approve_tx = deposit_token.approve_float(ew3.to_checksum_address(TRI_CRYPTO_POOL_ADDRESS),
                                                  deposit_amount, {'from': wallet.address,
                                                                   'gas': 100000,
                                                                   'maxPriorityFeePerGas': 1000000000})
@@ -124,10 +124,10 @@ if __name__ == '__main__':
 
     deposit_to_convex = True  # set false to switch off the below Convex deposit
     if current_lp_token_balance > 0 and deposit_to_convex:
-        convex_allowance = lp_token.allowance(wallet.address, ew3.toChecksumAddress(CONVEX_BOOSTER_ADDRESS))
+        convex_allowance = lp_token.allowance(wallet.address, ew3.to_checksum_address(CONVEX_BOOSTER_ADDRESS))
         if convex_allowance < current_lp_token_balance:
             to_allow = current_lp_token_balance - convex_allowance
-            approve_tx = lp_token.approve(ew3.toChecksumAddress(CONVEX_BOOSTER_ADDRESS),
+            approve_tx = lp_token.approve(ew3.to_checksum_address(CONVEX_BOOSTER_ADDRESS),
                                           current_lp_token_balance, {'from': wallet.address,
                                                                      'gas': 100000,
                                                                      'maxPriorityFeePerGas': 1000000000})
@@ -135,7 +135,7 @@ if __name__ == '__main__':
             print(f'Waiting for Convex approval tx to confirm: {approve_hash.hex()}')
             ew3.eth.wait_for_transaction_receipt(approve_hash)
 
-        convex_contract = IConvexDeposits(ew3, ew3.toChecksumAddress(CONVEX_BOOSTER_ADDRESS))
+        convex_contract = IConvexDeposits(ew3, ew3.to_checksum_address(CONVEX_BOOSTER_ADDRESS))
         # 38 is the magic number for TriPool that comes from https://www.convexfinance.com/stake
         # True here is to enable stake (to start earning rewards)
         cvx_tx = convex_contract.deposit(38, current_lp_token_balance, True, {'from': wallet.address,
@@ -151,7 +151,7 @@ if __name__ == '__main__':
                   'Please send some more ETH to proceed')
             exit(1)
 
-    convex_staking_contract = IRewardStaking(ew3, ew3.toChecksumAddress(CONVEX_REWARD_ADDRESS))
+    convex_staking_contract = IRewardStaking(ew3, ew3.to_checksum_address(CONVEX_REWARD_ADDRESS))
 
     crv = ew3.v0.get_erc_token(TokenSymbol.CRV)
 
