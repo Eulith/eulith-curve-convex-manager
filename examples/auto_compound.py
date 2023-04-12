@@ -1,4 +1,6 @@
 import time
+import os
+import sys
 
 from eulith_web3.contract_bindings.curve.curve_v2_tri_crypto import CurveV2TriCrypto
 from eulith_web3.contract_bindings.convex.i_convex_deposits import IConvexDeposits
@@ -10,8 +12,11 @@ from eulith_web3.signing import construct_signing_middleware, LocalSigner
 from eulith_web3.swap import EulithSwapRequest
 from eulith_web3.exceptions import EulithRpcException
 
+sys.path.insert(0, os.getcwd())
+
 from utils.settings import PRIVATE_KEY, EULITH_REFRESH_TOKEN
 from utils.banner import print_banner
+from utils.common import ensure_approval
 
 TRI_CRYPTO_POOL_ADDRESS = '0xd51a44d3fae010294c616388b506acda1bfaae46'
 CONVEX_BOOSTER_ADDRESS = '0xf403c135812408bfbe8713b5a23a04b3d48aae31'
@@ -19,6 +24,7 @@ CONVEX_REWARD_ADDRESS = '0x9D5C5E364D81DaB193b72db9E9BE9D8ee669B652'
 
 if __name__ == '__main__':
     wallet = LocalSigner(PRIVATE_KEY)
+
     print_banner()
 
     print(f'RUNNING WITH WALLET ADDRESS: {wallet.address}\n')
@@ -85,17 +91,7 @@ if __name__ == '__main__':
         print(f'Waiting for deposit WETH tx to confirm: {dep_hash.hex()}')
         ew3.eth.wait_for_transaction_receipt(dep_hash)
 
-    pool_allowance = deposit_token.allowance_float(
-        ew3.to_checksum_address(wallet.address),
-        ew3.to_checksum_address(TRI_CRYPTO_POOL_ADDRESS))
-    if pool_allowance < deposit_amount:
-        approve_tx = deposit_token.approve_float(ew3.to_checksum_address(TRI_CRYPTO_POOL_ADDRESS),
-                                                 deposit_amount, {'from': wallet.address,
-                                                                  'gas': 100000,
-                                                                  'maxPriorityFeePerGas': 1000000000})
-        app_hash = ew3.eth.send_transaction(approve_tx)
-        print(f'Waiting for Curve approval tx to confirm: {app_hash.hex()}')
-        ew3.eth.wait_for_transaction_receipt(app_hash)
+    ensure_approval(ew3, deposit_token, deposit_amount, TRI_CRYPTO_POOL_ADDRESS)
 
     deposit_to_curve = True  # set false to switch off the below Curve deposit
     if deposit_to_curve:
